@@ -3,7 +3,7 @@ const cors = require("cors");
 const helmet = require("helmet");
 const morgan = require("morgan");
 const cookieParser = require("cookie-parser");
-
+const translatorRoutes = require("./routes/translatorRoutes");
 const authRoutes = require("./routes/authRoutes");
 const aiRoutes = require("./routes/aiRoutes");
 
@@ -20,10 +20,9 @@ app.use(helmet());
 
 app.use(morgan("dev"));
 
-// API Routes
+// API // Routes
 app.use("/api/auth", authRoutes);
-app.use("/api/ai", aiRoutes);
-
+app.use("/api/translator", translatorRoutes);
 // Home Route
 app.get("/", (req, res) => {
   res.json({
