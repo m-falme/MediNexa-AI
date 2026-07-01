@@ -1,0 +1,143 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  PATIENT
+  DOCTOR
+  CAREGIVER
+  ADMIN
+}
+
+enum Gender {
+  MALE
+  FEMALE
+  OTHER
+}
+
+enum AppointmentStatus {
+  PENDING
+  CONFIRMED
+  COMPLETED
+  CANCELLED
+}
+
+model User {
+  id            String   @id @default(cuid())
+  fullName      String
+  email         String   @unique
+  password      String
+  phone         String?
+  dateOfBirth   DateTime?
+  gender        Gender?
+  role          UserRole @default(PATIENT)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  appointments  Appointment[]
+  records       MedicalRecord[]
+  prescriptions Prescription[]
+  labResults    LabResult[]
+  aiChats       AIConversation[]
+}
+
+model Hospital {
+  id          String @id @default(cuid())
+  name        String
+  county      String
+  address     String
+  phone       String?
+
+  appointments Appointment[]
+}
+
+model Appointment {
+  id          String @id @default(cuid())
+
+  patientId   String
+  patient     User @relation(fields: [patientId], references: [id])
+
+  hospitalId  String
+  hospital    Hospital @relation(fields: [hospitalId], references: [id])
+
+  appointmentDate DateTime
+
+  reason      String
+
+  status      AppointmentStatus @default(PENDING)
+
+  createdAt   DateTime @default(now())
+}
+
+model MedicalRecord {
+  id          String @id @default(cuid())
+
+  title       String
+
+  description String
+
+  fileUrl     String?
+
+  createdAt   DateTime @default(now())
+
+  userId      String
+
+  user        User @relation(fields: [userId], references: [id])
+}
+
+model Prescription {
+
+  id          String @id @default(cuid())
+
+  medicine    String
+
+  dosage      String
+
+  instructions String
+
+  createdAt DateTime @default(now())
+
+  userId String
+
+  user User @relation(fields:[userId], references:[id])
+
+}
+
+model LabResult {
+
+  id String @id @default(cuid())
+
+  title String
+
+  fileUrl String
+
+  aiExplanation String?
+
+  uploadedAt DateTime @default(now())
+
+  userId String
+
+  user User @relation(fields:[userId], references:[id])
+
+}
+
+model AIConversation {
+
+  id String @id @default(cuid())
+
+  question String
+
+  answer String
+
+  createdAt DateTime @default(now())
+
+  userId String
+
+  user User @relation(fields:[userId], references:[id])
+
+}
